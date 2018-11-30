@@ -14,8 +14,7 @@ document.body.addEventListener('modsLoaded', function () {
 			var currentProxies;
 			
 			if(player !== null && 
-					(currentProxies = simplify.getEntityProxies(player)) !== proxies &&
-					currentProxies.lightningSlowMo !== undefined){
+					(currentProxies = simplify.getEntityProxies(player)) !== proxies){
 				modifyProxies(currentProxies, 0.2);
 			}
 			
@@ -24,16 +23,17 @@ document.body.addEventListener('modsLoaded', function () {
 				new cc.ig.combatActions.REMOVE_PROXIES({sticking: false, group:"aura"}).start(cc.ig.playerInstance());
 			
 			if(ig.input.state("slowTime") || ig.input.state("stopTime")) {
-				var x = ig.input.state("stopTime") ? 10 : 1
-				for(var i = 0; i < x; i++)
-					simplify.runCombatAction(new cc.ig.combatActions.SHOOT_PROXY({ align: "BOTTOM", proxy:"infiniteSlowMo", offset:{x:0,y:0,z:0} }), cc.ig.playerInstance());
+				if (ig.input.state("slowTime"))
+					modifyProxies(currentProxies, 0.2)
+				else
+					modifyProxies(currentProxies, Math.pow(0.2, 10))
+				simplify.runAction(new cc.ig.combatActions.SHOOT_PROXY({ align: "BOTTOM", proxy:"infiniteSlowMo", offset:{x:0,y:0,z:0} }), cc.ig.playerInstance());
 			}
 		}
 		
 		function modifyProxies(currentProxies, time){
 			proxies = currentProxies;
 			proxies.infiniteSlowMo = proxies.lightningSlowMo;
-			proxies.lightningSlowMo = undefined;
 			var action = simplify.getProxyAction(proxies.infiniteSlowMo.data.action);
 			
 			action.group = "infinteSlowMo";
