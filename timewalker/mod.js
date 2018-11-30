@@ -17,6 +17,10 @@ document.body.addEventListener('modsLoaded', function () {
 			slowTime: false,
 			stopTime: false
 		}
+		active = {
+			slowTime: false,
+			stopTime: false
+		}
 
 		function onUpdate() {
 			var player = cc.ig.playerInstance();
@@ -30,11 +34,16 @@ document.body.addEventListener('modsLoaded', function () {
 			held.slowTime = ig.input.state("slowTime");
 			held.stopTime = ig.input.state("stopTime");
 
-			if (proxies !== undefined) {
-				if (ig.input.state("resetTime"))
+			if (player !== null) {
+				if (ig.input.state("resetTime")) {
+					active.slowTime = false;
+					active.stopTime = false;
 					new cc.ig.combatActions.REMOVE_PROXIES({sticking: false, group: "aura"}).start(cc.ig.playerInstance());
+				}
 
-				else if (!clicked.slowTime && held.slowTime) {
+				else if (!clicked.slowTime && held.slowTime && !active.slowTime) {
+					active.slowTime = true;
+					active.stopTime = false;
 					new cc.ig.combatActions.REMOVE_PROXIES({sticking: false, group: "aura"}).start(cc.ig.playerInstance());
 					modifyProxies(currentProxies, 0.2);
 					simplify.runAction(new cc.ig.combatActions.SHOOT_PROXY({
@@ -43,7 +52,9 @@ document.body.addEventListener('modsLoaded', function () {
 						offset: {x: 0, y: 0, z: 0}
 					}), cc.ig.playerInstance());
 				
-				} else if (!clicked.stopTime && held.stopTime) {
+				} else if (!clicked.stopTime && held.stopTime && !active.stopTime) {
+					active.slowTime = false;
+					active.stopTime = true;
 					new cc.ig.combatActions.REMOVE_PROXIES({sticking: false, group: "aura"}).start(cc.ig.playerInstance());
 					modifyProxies(currentProxies, Math.pow(0.2, 10));
 					simplify.runAction(new cc.ig.combatActions.SHOOT_PROXY({
