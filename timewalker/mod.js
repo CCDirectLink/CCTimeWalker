@@ -1,30 +1,45 @@
 if (!cc)
 	throw "No Modloader Found!";
 
-document.body.addEventListener('modsLoaded', function () {
-	var timewalker = new function () {
-		var proxies = undefined;
+document.body.addEventListener('modsLoaded', () => {
+	function timewalker () {
+		
+		let proxies = undefined;
 
 		ig.input.bind(84, "slowTime");
 		ig.input.bind(82, "resetTime");
 		ig.input.bind(67, "stopTime");
 		
-		clicked = {
+		let clicked = {
 			slowTime: false,
 			stopTime: false
 		}
-		held = {
+		let held = {
 			slowTime: false,
 			stopTime: false
 		}
-		active = {
+		let active = {
 			slowTime: false,
 			stopTime: false
 		}
+		
+		//Intercept loadMap
+       const t = cc.ig.gameMain[cc.ig.varNames.gameMainLoadMap];
+	   cc.ig.gameMain[cc.ig.varNames.gameMainLoadMap] = (i => {
+		   document.body.dispatchEvent(new Event('beforeMapLoad'));
+		   const e = t.call(cc.ig.gameMain, i);
+		   e
+		   document.body.dispatchEvent(new Event('afterMapLoad'));
+		});
+		
+		document.body.addEventListener('afterMapLoad', () => {
+			active.slowTime = false;
+			active.stopTime = false;
+		});
 
 		function onUpdate() {
-			var player = cc.ig.playerInstance();
-			var currentProxies;
+			let player = cc.ig.playerInstance();
+			let currentProxies;
 
 			if (player !== null &&
 				(currentProxies = simplify.getEntityProxies(player)) !== proxies) {
@@ -75,7 +90,7 @@ document.body.addEventListener('modsLoaded', function () {
 		function modifyProxies(currentProxies, time) {
 			proxies = currentProxies;
 			proxies.infiniteSlowMo = proxies.lightningSlowMo;
-			var action = simplify.getProxyAction(proxies.infiniteSlowMo.data.action);
+			let action = simplify.getProxyAction(proxies.infiniteSlowMo.data.action);
 
 			action.group = "infinteSlowMo";
 			action = simplify.getNextProxyAction(action);
@@ -86,6 +101,7 @@ document.body.addEventListener('modsLoaded', function () {
 			action.time = -1;
 		}
 
-		simplify.registerUpdate(onUpdate);
-	}();
+		simplify.registerUpdate(() => onUpdate());
+	};
+	timewalker();
 });
