@@ -1,8 +1,11 @@
 {
 	"name": "timewalker",
+	"license": "MIT",
+	"homepage": "https://github.com/CCDirectLink/CCTimeWalker",
+	"description": "Lets you control time.",
 	"main": "mod.js",
 	"module": true,
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"ccmodDependencies": {
 		"Simplify": "^2.0.0",
 		"crosscode": "^1.1.0"
