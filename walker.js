@@ -1,10 +1,10 @@
 export class Walker {
 	constructor() {
 		this.proxiesLoaded = false;
-        
+
 		this.slowActive = false;
 		this.stopActive = false;
-        
+
 		this.lastslowTime = false;
 		this.lastslowTime = false;
 		this.lastresetTime = false;
@@ -18,7 +18,7 @@ export class Walker {
 		ig.input.bind(67, 'stopTime');
 
 		simplify.registerUpdate(() => this._update());
-        
+
 		this._onMapLoad(() => {
 			this.slowActive = false;
 			this.stopActive = false;
@@ -29,33 +29,33 @@ export class Walker {
 		if (ig.game.playerEntity.infinteStop || !ig.game.playerEntity.proxies.lightningSlowMo) {
 			return;
 		}
-        
+
 		this._initProxy('infinteStop', 0.0001);
 		this._initProxy('infinteSlowMo', 0.2);
 
 		this.proxiesLoaded = true;
 	}
-    
+
 	/**
-     * @param {string} name 
-     * @param {number} factor 
+     * @param {string} name
+     * @param {number} factor
      */
 	_initProxy(name, factor) {
 		const player = ig.game.playerEntity;
 		const proxy = player.proxies[name] = this._clone(player.proxies.lightningSlowMo);
 		const data = proxy.data = this._clone(proxy.data);
 		const action = data.action = this._clone(data.action);
-        
+
 		let step = action.rootStep = this._clone(action.rootStep);
 		step.group = name;
-        
+
 		step = step._nextStep = this._clone(step._nextStep); //Copy, assign and edit
 		step.group = name;
-        
+
 		step = step._nextStep = this._clone(step._nextStep);
 		step = step._nextStep = this._clone(step._nextStep);
 		step.factor = factor;
-        
+
 		step = step._nextStep = this._clone(step._nextStep);
 		step.time = -1;
 	}
@@ -74,7 +74,7 @@ export class Walker {
 		if (!this.proxiesLoaded) {
 			return;
 		}
-        
+
 		if (resetPressed) {
 			this._reset();
 		}
@@ -85,28 +85,28 @@ export class Walker {
 			this._stop();
 		}
 	}
-    
+
 	_reset() {
 		this.slowActive = false;
 		this.stopActive = false;
 		new ig.ACTION_STEP.REMOVE_PROXIES({sticking: false, group: 'aura'}).start(ig.game.playerEntity);
 	}
-    
+
 	_slow() {
 		this._reset();
 		this.slowActive = true;
 		this._spawnProxy('infinteSlowMo');
 	}
-    
+
 	_stop() {
 		this._reset();
 		this.stopActive = true;
 		this._spawnProxy('infinteStop');
 	}
-    
+
 	/**
-     * 
-     * @param {string} name 
+     *
+     * @param {string} name
      */
 	_spawnProxy(name) {
 		new ig.ACTION_STEP.SHOOT_PROXY({
@@ -132,10 +132,10 @@ export class Walker {
 		result.__proto__ = obj.__proto__;
 		return result;
 	}
-    
+
 	/**
-     * 
-     * @param {() => void} cb 
+     *
+     * @param {() => void} cb
      */
 	_onMapLoad(cb) {
 		const original = ig.game.loadLevel;
@@ -144,7 +144,7 @@ export class Walker {
 			return original.apply(ig.game, args);
 		};
 	}
-    
+
 	/**
      * @returns {string}
      */
