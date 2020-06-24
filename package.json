@@ -7,7 +7,6 @@
 	"module": true,
 	"version": "0.2.1",
 	"ccmodDependencies": {
-		"Simplify": "^2.0.0",
 		"crosscode": "^1.1.0"
 	}
 }

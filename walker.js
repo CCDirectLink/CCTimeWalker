@@ -13,16 +13,17 @@ export class Walker {
 	}
 
 	_init() {
-		ig.input.bind(84, 'slowTime');
-		ig.input.bind(82, 'resetTime');
-		ig.input.bind(67, 'stopTime');
+		ig.input.bind(ig.KEY.T, 'slowTime');
+		ig.input.bind(ig.KEY.R, 'resetTime');
+		ig.input.bind(ig.KEY.C, 'stopTime');
 
-		simplify.registerUpdate(() => this._update());
+		ig.game.addons.postUpdate.push(this);
+		ig.game.addons.levelLoadStart.push(this);
+	}
 
-		this._onMapLoad(() => {
-			this.slowActive = false;
-			this.stopActive = false;
-		});
+	onLevelLoadStart() {
+		this.slowActive = false;
+		this.stopActive = false;
 	}
 
 	_initProxies() {
@@ -37,9 +38,9 @@ export class Walker {
 	}
 
 	/**
-     * @param {string} name
-     * @param {number} factor
-     */
+	 * @param {string} name
+	 * @param {number} factor
+	 */
 	_initProxy(name, factor) {
 		const player = ig.game.playerEntity;
 		const proxy = player.proxies[name] = this._clone(player.proxies.lightningSlowMo);
@@ -60,11 +61,7 @@ export class Walker {
 		step.time = -1;
 	}
 
-	_update() {
-		const slowPressed = this._pressed('slowTime');
-		const stopPressed = this._pressed('stopTime');
-		const resetPressed = this._pressed('resetTime');
-
+	onPostUpdate() {
 		const player = ig.game.playerEntity;
 		if (!player) {
 			return;
@@ -75,13 +72,13 @@ export class Walker {
 			return;
 		}
 
-		if (resetPressed) {
+		if (ig.input.pressed('resetTime')) {
 			this._reset();
 		}
-		if (slowPressed && !this.slowActive) {
+		if (ig.input.pressed('slowTime') && !this.slowActive) {
 			this._slow();
 		}
-		if (stopPressed && !this.stopActive) {
+		if (ig.input.pressed('stopTime') && !this.stopActive) {
 			this._stop();
 		}
 	}
@@ -105,9 +102,9 @@ export class Walker {
 	}
 
 	/**
-     *
-     * @param {string} name
-     */
+	 *
+	 * @param {string} name
+	 */
 	_spawnProxy(name) {
 		new ig.ACTION_STEP.SHOOT_PROXY({
 			align: 'BOTTOM',
@@ -116,39 +113,9 @@ export class Walker {
 		}).run(ig.game.playerEntity);
 	}
 
-	/**
-     * @param {string} name
-     * @returns {boolean}
-     */
-	_pressed(name) {
-		const last = this['last' + name];
-		const current = ig.input.state(name);
-		this['last' + name] = current;
-		return !last && current;
-	}
-
 	_clone(obj) {
 		const result = Object.assign({}, obj);
 		result.__proto__ = obj.__proto__;
 		return result;
-	}
-
-	/**
-     *
-     * @param {() => void} cb
-     */
-	_onMapLoad(cb) {
-		const original = ig.game.loadLevel;
-		ig.game.loadLevel = (...args) => {
-			cb();
-			return original.apply(ig.game, args);
-		};
-	}
-
-	/**
-     * @returns {string}
-     */
-	_getConfigName() {
-		return ig.game.playerEntity.model.config.name;
 	}
 }
