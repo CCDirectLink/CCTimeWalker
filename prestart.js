@@ -1,30 +1,25 @@
-export class Walker {
-	constructor() {
-		this.proxiesLoaded = false;
+sc.TimeWalkerMod = ig.GameAddon.extend({
+	proxiesLoaded: false,
+	slowActive: false,
+	stopActive: false,
 
-		this.slowActive = false;
-		this.stopActive = false;
+	init() {
+		this.parent('TimeWalkerMod');
 
-		this.lastslowTime = false;
-		this.lastslowTime = false;
-		this.lastresetTime = false;
-
-		this._init();
-	}
-
-	_init() {
+		// Users have to unbind these keybindings first though because
+		// sc.KeyBinder loads configured keybindings after GameAddons are
+		// initialized. Can be fixed by using sc.OPTIONS_DEFINITION, but this
+		// needs input-api in ccloader 2, so I'll fix this in the ccloader 3
+		// forwardport.
 		ig.input.bind(ig.KEY.T, 'slowTime');
 		ig.input.bind(ig.KEY.R, 'resetTime');
 		ig.input.bind(ig.KEY.C, 'stopTime');
-
-		ig.game.addons.postUpdate.push(this);
-		ig.game.addons.levelLoadStart.push(this);
-	}
+	},
 
 	onLevelLoadStart() {
 		this.slowActive = false;
 		this.stopActive = false;
-	}
+	},
 
 	_initProxies() {
 		if (ig.game.playerEntity.infinteStop || !ig.game.playerEntity.proxies.lightningSlowMo) {
@@ -35,7 +30,7 @@ export class Walker {
 		this._initProxy('infinteSlowMo', 0.2);
 
 		this.proxiesLoaded = true;
-	}
+	},
 
 	/**
 	 * @param {string} name
@@ -59,7 +54,7 @@ export class Walker {
 
 		step = step._nextStep = this._clone(step._nextStep);
 		step.time = -1;
-	}
+	},
 
 	onPostUpdate() {
 		const player = ig.game.playerEntity;
@@ -81,25 +76,25 @@ export class Walker {
 		if (ig.input.pressed('stopTime') && !this.stopActive) {
 			this._stop();
 		}
-	}
+	},
 
 	_reset() {
 		this.slowActive = false;
 		this.stopActive = false;
 		new ig.ACTION_STEP.REMOVE_PROXIES({sticking: false, group: 'aura'}).start(ig.game.playerEntity);
-	}
+	},
 
 	_slow() {
 		this._reset();
 		this.slowActive = true;
 		this._spawnProxy('infinteSlowMo');
-	}
+	},
 
 	_stop() {
 		this._reset();
 		this.stopActive = true;
 		this._spawnProxy('infinteStop');
-	}
+	},
 
 	/**
 	 *
@@ -111,11 +106,13 @@ export class Walker {
 			proxy: name,
 			offset: {x: 0, y: 0, z: 0}
 		}).run(ig.game.playerEntity);
-	}
+	},
 
 	_clone(obj) {
 		const result = Object.assign({}, obj);
 		result.__proto__ = obj.__proto__;
 		return result;
 	}
-}
+});
+
+ig.addGameAddon(() => (sc.timewalker = new sc.TimeWalkerMod()));

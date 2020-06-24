@@ -3,7 +3,7 @@
 	"license": "MIT",
 	"homepage": "https://github.com/CCDirectLink/CCTimeWalker",
 	"description": "Lets you control time.",
-	"main": "mod.js",
+	"prestart": "prestart.js",
 	"module": true,
 	"version": "0.2.1",
 	"ccmodDependencies": {
