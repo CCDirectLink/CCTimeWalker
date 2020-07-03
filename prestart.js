@@ -1,19 +1,40 @@
+ccmod3.resources.jsonPatches.add('data/players/lea.json', (data) => {
+	function initProxy(name, factor) {
+		const proxy = ig.copy(data.proxies.lightningSlowMo);
+
+		const actions = proxy.action;
+		actions[0].group = name;
+		actions[1].group = name;
+		actions[3].factor = factor;
+		actions[4].time = -1;
+
+		data.proxies[name] = proxy;
+	}
+
+	initProxy('infiniteStop', 0.0001);
+	initProxy('infiniteSlowMo', 0.2);
+});
+
+function initKeybinding(name, defaultKey, header = '') {
+	sc.OPTIONS_DEFINITION[`keys-${name}`] = {
+		type: 'CONTROLS',
+		init: { key1: defaultKey },
+		cat: sc.OPTION_CATEGORY.CONTROLS,
+		hasDivider: header.length > 0,
+		header
+	};
+}
+
+initKeybinding('slowTime', ig.KEY.T, 'timewalker');
+initKeybinding('resetTime', ig.KEY.R);
+initKeybinding('stopTime', ig.KEY.C);
+
 sc.TimeWalkerMod = ig.GameAddon.extend({
-	proxiesLoaded: false,
 	slowActive: false,
 	stopActive: false,
 
 	init() {
 		this.parent('TimeWalkerMod');
-
-		// Users have to unbind these keybindings first though because
-		// sc.KeyBinder loads configured keybindings after GameAddons are
-		// initialized. Can be fixed by using sc.OPTIONS_DEFINITION, but this
-		// needs input-api in ccloader 2, so I'll fix this in the ccloader 3
-		// forwardport.
-		ig.input.bind(ig.KEY.T, 'slowTime');
-		ig.input.bind(ig.KEY.R, 'resetTime');
-		ig.input.bind(ig.KEY.C, 'stopTime');
 	},
 
 	onLevelLoadStart() {
@@ -21,49 +42,9 @@ sc.TimeWalkerMod = ig.GameAddon.extend({
 		this.stopActive = false;
 	},
 
-	_initProxies() {
-		if (ig.game.playerEntity.infinteStop || !ig.game.playerEntity.proxies.lightningSlowMo) {
-			return;
-		}
-
-		this._initProxy('infinteStop', 0.0001);
-		this._initProxy('infinteSlowMo', 0.2);
-
-		this.proxiesLoaded = true;
-	},
-
-	/**
-	 * @param {string} name
-	 * @param {number} factor
-	 */
-	_initProxy(name, factor) {
-		const player = ig.game.playerEntity;
-		const proxy = player.proxies[name] = this._clone(player.proxies.lightningSlowMo);
-		const data = proxy.data = this._clone(proxy.data);
-		const action = data.action = this._clone(data.action);
-
-		let step = action.rootStep = this._clone(action.rootStep);
-		step.group = name;
-
-		step = step._nextStep = this._clone(step._nextStep); //Copy, assign and edit
-		step.group = name;
-
-		step = step._nextStep = this._clone(step._nextStep);
-		step = step._nextStep = this._clone(step._nextStep);
-		step.factor = factor;
-
-		step = step._nextStep = this._clone(step._nextStep);
-		step.time = -1;
-	},
-
 	onPostUpdate() {
 		const player = ig.game.playerEntity;
 		if (!player) {
-			return;
-		}
-
-		this._initProxies(player);
-		if (!this.proxiesLoaded) {
 			return;
 		}
 
@@ -87,13 +68,13 @@ sc.TimeWalkerMod = ig.GameAddon.extend({
 	_slow() {
 		this._reset();
 		this.slowActive = true;
-		this._spawnProxy('infinteSlowMo');
+		this._spawnProxy('infiniteSlowMo');
 	},
 
 	_stop() {
 		this._reset();
 		this.stopActive = true;
-		this._spawnProxy('infinteStop');
+		this._spawnProxy('infiniteStop');
 	},
 
 	/**
@@ -106,12 +87,6 @@ sc.TimeWalkerMod = ig.GameAddon.extend({
 			proxy: name,
 			offset: {x: 0, y: 0, z: 0}
 		}).run(ig.game.playerEntity);
-	},
-
-	_clone(obj) {
-		const result = Object.assign({}, obj);
-		result.__proto__ = obj.__proto__;
-		return result;
 	}
 });
 

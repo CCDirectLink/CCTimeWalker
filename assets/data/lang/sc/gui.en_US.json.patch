@@ -1,0 +1,16 @@
+{
+  "labels": {
+    "options": {
+      "headers": {
+        "timewalker": "timewalker"
+      },
+      "controls": {
+        "keys": {
+          "slowTime": "Slow time",
+          "resetTime": "Reset time",
+          "stopTime": "Stop time"
+        }
+      }
+    }
+  }
+}
