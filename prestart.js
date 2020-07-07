@@ -1,4 +1,4 @@
-ccmod3.resources.jsonPatches.add('data/players/lea.json', (data) => {
+ccmod.resources.jsonPatches.add('data/players/lea.json', (data) => {
 	function initProxy(name, factor) {
 		const proxy = ig.copy(data.proxies.lightningSlowMo);
 
