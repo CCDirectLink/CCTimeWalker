@@ -11,14 +11,8 @@ module.exports = {
         "sourceType": "module"
     },
     "globals": {
-        "cc": true,
         "ig": true,
-        "sc": true,
-        "cc": true,
-        "reloadTables": true,
-        "entries": true,
-        "simplify": true,
-        "$": true
+        "sc": true
     },
     "rules": {
         "indent": [
