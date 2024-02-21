@@ -1,0 +1,13 @@
+{
+  "id": "timewalker",
+  "version": "0.3.1",
+  "title": "timewalker",
+  "description": "Lets you control time.",
+  "repository": "https://github.com/CCDirectLink/CCTimeWalker",
+  "tags": ["fun"],
+  "authors": ["2767mr", "tiredcoffee"],
+  "dependencies": {
+    "crosscode": "^1.1.0"
+  },
+  "plugin": "walker.js"
+}
